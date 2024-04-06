@@ -166,7 +166,7 @@ class FilmeApp(App):
         ano_lancamento = int(self.ano_input.text)
 
         novo_filme = Filme(titulo, diretor, genero, ano_lancamento)
-        self.lista_filmes.insere_no_frente(novo_filme)
+        self.lista_filmes.insere_no_fim(novo_filme)
 
         # Atualiza o rótulo com a mensagem
         self.message_box.text = 'Filme inserido na fim: {} ({})'.format(titulo, ano_lancamento)
@@ -196,7 +196,8 @@ class FilmeApp(App):
         carousel_layout = BoxLayout(orientation='vertical', size_hint=(1, 0.6))
         carousel = Carousel(direction='right')
         
-        src = ["src/imagem1.png","src/imagem2.png","src/imagem3.png","src/imagem4.png","src/imagem5.png","src/imagem7.jpg"]
+        src = ["src/imagem1.png","src/imagem2.png","src/imagem3.png","src/imagem4.png","src/imagem5.png","src/imagem7.jpg","src/imagem8.jpg"
+               ,"src/imagem9.jpg","src/imagem10.jpg"]
         for img_source in src:
             image = AsyncImage(source=img_source, allow_stretch=True, size_hint=(1, 1))  # O tamanho da imagem é definido automaticamente
             carousel.add_widget(image)
