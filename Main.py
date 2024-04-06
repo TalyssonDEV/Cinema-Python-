@@ -5,7 +5,8 @@ from kivy.uix.label import Label # type: ignore
 from kivy.uix.textinput import TextInput # type: ignore
 from kivy.uix.carousel import Carousel # type: ignore
 from kivy.uix.image import AsyncImage # type: ignore
-
+from kivy.uix.scrollview import ScrollView # type: ignore
+from kivy.uix.popup import Popup # type: ignore
 class Filme:
     def __init__(self, titulo, diretor, genero, ano_lancamento):
         self.titulo = titulo
@@ -94,11 +95,14 @@ class FilmeApp(App):
         layout.add_widget(carousel_layout)
 
         # Caixa de mensagem
-        self.message_box = Label(text='', size_hint=(1, 0.1))
+        self.message_box = Label(text='', size_hint=(1, 0.2))
         layout.add_widget(self.message_box)
 
-        # Widgets para entrada de dados
-        input_layout = BoxLayout(orientation='horizontal', size_hint=(1, 0.2))
+        # Layout para os inputs e botões
+        input_button_layout = BoxLayout(orientation='horizontal', size_hint=(1, 0.2))
+
+        # Layout para os inputs
+        input_layout = BoxLayout(orientation='vertical', size_hint=(0.5, 1))
         self.titulo_input = TextInput(hint_text='Título do filme')
         self.diretor_input = TextInput(hint_text='Diretor do filme')
         self.genero_input = TextInput(hint_text='Gênero do filme')
@@ -107,19 +111,17 @@ class FilmeApp(App):
         input_layout.add_widget(self.diretor_input)
         input_layout.add_widget(self.genero_input)
         input_layout.add_widget(self.ano_input)
-        layout.add_widget(input_layout)
+        input_button_layout.add_widget(input_layout)
 
-        # Botões
-        button_layout = BoxLayout(orientation='horizontal', size_hint=(1, 0.1))
-        button_layout.add_widget(Button(text='Adicionar filme', on_press=self.adicionar_filme, size_hint=(0.25, 1)))
-        button_layout.add_widget(Button(text='Inserir na frente', on_press=self.inserir_na_frente, size_hint=(0.25, 1)))
-        button_layout.add_widget(Button(text='Inserir na fim', on_press=self.insere_no_fim, size_hint=(0.25, 1)))
-        button_layout.add_widget(Button(text='Exibir lista de filmes', on_press=self.exibir_lista, size_hint=(0.25, 1)))
-        layout.add_widget(button_layout)
+        # Layout para os botões
+        button_layout = BoxLayout(orientation='vertical', size_hint=(0.5, 1))
+        button_layout.add_widget(Button(text='Adicionar filme', on_press=self.adicionar_filme))
+        button_layout.add_widget(Button(text='Inserir na frente', on_press=self.inserir_na_frente))
+        button_layout.add_widget(Button(text='Inserir na fim', on_press=self.insere_no_fim))
+        button_layout.add_widget(Button(text='Exibir lista de filmes', on_press=self.exibir_lista))
+        input_button_layout.add_widget(button_layout)
 
-        # Rótulo para exibir mensagem
-        self.message_label = Label(text='', size_hint=(1, None), height=30)
-        layout.add_widget(self.message_label)
+        layout.add_widget(input_button_layout)
 
         return layout
 
@@ -133,7 +135,7 @@ class FilmeApp(App):
         self.lista_filmes.insere_no_frente(novo_filme)
 
         # Atualiza o rótulo com a mensagem
-        self.message_label.text = 'Filme adicionado: {} ({})'.format(titulo, ano_lancamento)
+        self.message_box.text = 'Filme adicionado: {} ({})'.format(titulo, ano_lancamento)
 
         self.titulo_input.text = ''
         self.diretor_input.text = ''
@@ -150,7 +152,7 @@ class FilmeApp(App):
         self.lista_filmes.insere_no_frente(novo_filme)
 
         # Atualiza o rótulo com a mensagem
-        self.message_label.text = 'Filme inserido na frente: {} ({})'.format(titulo, ano_lancamento)
+        self.message_box.text = 'Filme inserido na frente: {} ({})'.format(titulo, ano_lancamento)
 
         self.titulo_input.text = ''
         self.diretor_input.text = ''
@@ -167,7 +169,7 @@ class FilmeApp(App):
         self.lista_filmes.insere_no_frente(novo_filme)
 
         # Atualiza o rótulo com a mensagem
-        self.message_label.text = 'Filme inserido na fim: {} ({})'.format(titulo, ano_lancamento)
+        self.message_box.text = 'Filme inserido na fim: {} ({})'.format(titulo, ano_lancamento)
 
         self.titulo_input.text = ''
         self.diretor_input.text = ''
@@ -179,14 +181,20 @@ class FilmeApp(App):
         if isinstance(filmes, str):  # Verifica se a lista está vazia
             self.message_label.text = filmes
         else:
-            self.message_label.text = 'Lista de filmes:'
-            for filme in filmes:
-                self.message_label.text += '\n{} ({}) - {}'.format(filme.titulo, filme.ano_lancamento, filme.diretor)
+            content = BoxLayout(orientation='vertical')
+            scrollview = ScrollView()
+            list_layout = BoxLayout(orientation='vertical', size_hint=(1, None), spacing=5, padding=10)
+            for i, filme in enumerate(filmes, start=1):
+                label = Label(text='{} – {} ({}) - {}'.format(i, filme.titulo, filme.ano_lancamento, filme.diretor))
+                list_layout.add_widget(label)
+            scrollview.add_widget(list_layout)
+            content.add_widget(scrollview)
+            popup = Popup(title='Lista de Filmes', content=content, size_hint=(None, None), size=(400, 400))
+            popup.open()
 
     def create_carousel(self):
-        carousel_layout = BoxLayout(orientation='vertical')
+        carousel_layout = BoxLayout(orientation='vertical', size_hint=(1, 0.6))
         carousel = Carousel(direction='right')
-        
         
         src = ["src/imagem1.png","src/imagem2.png","src/imagem3.png","src/imagem4.png","src/imagem5.png","src/imagem7.jpg"]
         for img_source in src:
